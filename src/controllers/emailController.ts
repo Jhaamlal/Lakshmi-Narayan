@@ -6,11 +6,20 @@ import {
   rescheduleEmailServices,
   scheduleEmailsServices,
 } from '../services';
-import { AppError, sendSuccessResponse } from '../utils';
-import { Request, Response } from 'express';
+import { BadRequestError, sendSuccessResponse } from '../utils';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-export const scheduleEmailController = async (req: Request, res: Response) => {
+export const scheduleEmailController: RequestHandler<
+  Record<string, never>,
+  unknown,
+  {
+    scheduledAt: Date;
+    recipient: string;
+    subject: string;
+    body: string;
+  }
+> = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { recipient, subject, body, scheduledAt } = req.body;
     const email = await scheduleEmailsServices({
@@ -21,36 +30,45 @@ export const scheduleEmailController = async (req: Request, res: Response) => {
     });
     sendSuccessResponse(res, 'Schedule the Email', email, StatusCodes.CREATED);
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };
 
-export const getEmailController = async (req: Request, res: Response) => {
+export const getEmailController: RequestHandler<{ id: string }> = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const email = await getEmailService(+id);
     if (!email) {
-      return res.send(StatusCodes.NOT_FOUND).json({ error: 'Email not Found' });
+      throw new BadRequestError('Email not found');
     }
     sendSuccessResponse(res, ` email of thr ${id}`, email, StatusCodes.OK);
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };
 
-export const listAllMailsController = async (req: Request, res: Response) => {
+export const listAllMailsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const emails = await listEmailsServices();
     sendSuccessResponse(res, 'All emails', emails, StatusCodes.OK);
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };
 
-export const listFailMailsController = async (req: Request, res: Response) => {
+export const listFailMailsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const failedEmails = await listFailedEmailsServices();
     sendSuccessResponse(
@@ -60,12 +78,20 @@ export const listFailMailsController = async (req: Request, res: Response) => {
       StatusCodes.OK
     );
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };
 
-export const updateEmailController = async (req: Request, res: Response) => {
+export const updateEmailController: RequestHandler<
+  { id: string },
+  unknown,
+  {
+    scheduledAt: Date;
+    recipient: string;
+    subject: string;
+    body: string;
+  }
+> = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { recipient, subject, body, scheduledAt } = req.body;
@@ -82,12 +108,15 @@ export const updateEmailController = async (req: Request, res: Response) => {
       StatusCodes.OK
     );
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };
 
-export const deleteController = async (req: Request, res: Response) => {
+export const deleteController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const deletedEmailData = await deleteScheduledEmailService(+id);
@@ -98,7 +127,6 @@ export const deleteController = async (req: Request, res: Response) => {
       StatusCodes.OK
     );
   } catch (error) {
-    const message = (error as Error).message;
-    throw new AppError(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    next(error);
   }
 };

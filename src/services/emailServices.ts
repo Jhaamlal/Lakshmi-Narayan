@@ -19,22 +19,22 @@ export const getEmailService = async (id: number): Promise<Email | null> => {
 };
 
 export const listEmailsServices = async (): Promise<Email[]> => {
-  return await getAllEmails();
+  return getAllEmails();
 };
 
 export const listFailedEmailsServices = async (): Promise<Email[]> => {
-  return await getAllFailSendMail();
+  return getAllFailSendMail();
 };
 
 export const rescheduleEmailServices = async (
   id: number,
   data: Prisma.EmailUpdateInput
 ): Promise<Email> => {
-  return await updateEmail(id, data);
+  return updateEmail(id, data);
 };
 
 export const deleteScheduledEmailService = async (
   id: number
 ): Promise<Email> => {
-  return await deleteEmail(id);
+  return deleteEmail(id);
 };
