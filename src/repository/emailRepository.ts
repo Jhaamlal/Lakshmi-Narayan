@@ -19,6 +19,7 @@ export const getAllEmails = async (): Promise<Email[]> => {
 };
 
 // Get the mails that are not sent,
+// lte: less then equal to
 export const getAllFailSendMail = async (): Promise<Email[]> => {
   return await prisma.email.findMany({
     where: {
