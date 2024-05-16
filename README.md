@@ -60,4 +60,10 @@ Flow is
 > index.ts -> router ->controller->services ->repository 
 
 
+### I have let the Model folder there ,But it can be remove as I have initialize  the Prisma outside 
 
+--> Types is there ,for any kind of typescript ,interface and type definition
+
+--> Config is to save the any configuration, like env and other ,this folder is not needed in this case ,as I have put the things in the **.env** file  . But large project it may be needed 
+
+--> In route Index , file has been left empty, We can use that controlling versions, but as project was small I have left that empty 
